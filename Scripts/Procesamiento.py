@@ -1,41 +1,50 @@
-import ollama
-from sklearn.feature_extraction.text import TfidfVectorizer
+from langchain_ollama import OllamaEmbeddings
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_core.documents import Document
+from langchain_chroma import Chroma
+import uuid
+from langchain_community.document_loaders import PyPDFLoader
 
-# Assume you have a text document stored in a variable called 'document'
-document = "This is a sample text document that needs to be vectorized."
+text_splitter = RecursiveCharacterTextSplitter(
+    chunk_size=510,
+    chunk_overlap=50,
+    length_function=len,
+    separators=['\n', '.', '\n\n']
+)
 
-# Initialize Ollama (assuming it's running and accessible)
-# Replace 'your_ollama_model' with the actual model name you want to use for embeddings
-# For example, 'nomic-embed-text' or 'all-minilm'
-try:
-    ollama.embeddings(model='nomic-embed-text', prompt='This is a test message')
-except ollama.ResponseError as e:
-    print(f"Ollama not running or model not found: {e}")
-    print("Please make sure Ollama is running and you have the 'nomic-embed-text' model pulled.")
-    print("You can pull the model using: ollama pull nomic-embed-text")
-    exit() # Exit if Ollama is not set up
+embeddings_generator = OllamaEmbeddings(
+    model='mxbai-embed-large:latest'
+)
 
-# Generate embeddings using Ollama
-try:
-    response = ollama.embeddings(
-        model='nomic-embed-text',
-        prompt=document
+chroma_db_path = 'Hunger-Wings\database\docs\chromadb'
+
+vector_store = Chroma(
+    persist_directory=chroma_db_path,
+    embedding_function=embeddings_generator,
+    collection_name='pokemon'
+)
+
+txt_path = 'Hunger-Wings\database\docs\Microgravity Induces Pelvic Bone Loss through Osteoclastic Activity.txt'
+txt_text = ''
+
+with open(txt_path, 'r', encoding='utf-8') as file:
+    txt_text = file.read()
+
+print(len(txt_text))
+
+text_chunks = text_splitter.split_text(txt_text)
+print(len(text_chunks))
+
+for chunk in text_chunks:
+    document = Document(
+        id=str(uuid.uuid4()),
+        page_content=chunk,
+        metadata={
+            'name': 'Microgravity Induces Pelvic Bone Loss through Osteoclastic Activity',
+            'source': 'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3630201/',
+            }
     )
-    ollama_embedding = response['embedding']
-    print("Ollama Embedding:")
-    print(ollama_embedding)
-except Exception as e:
-    print(f"An error occurred during Ollama embedding: {e}")
 
+    vector_store.add_documents([document])
 
-# Alternatively, you can use TfidfVectorizer from scikit-learn
-# This is a traditional method and doesn't require Ollama
-tfidf_vectorizer = TfidfVectorizer()
-
-# Fit and transform the document
-tfidf_vector = tfidf_vectorizer.fit_transform([document])
-
-print("\nTF-IDF Vector:")
-print(tfidf_vector.toarray())
-
-# You can now use the 'ollama_embedding' or 'tfidf_vector' for further tasks like similarity calculations or machine learning models.
+vector_store.similarity_search('experimental animal procedures for STS-131', 5)
