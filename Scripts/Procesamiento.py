@@ -16,7 +16,7 @@ embeddings_generator = OllamaEmbeddings(
     model='mxbai-embed-large:latest'
 )
 
-chroma_db_path = 'Hunger-Wings\database\docs\chromadb'
+chroma_db_path = 'Hunger-Wings\database\chromadb'
 
 vector_store = Chroma(
     persist_directory=chroma_db_path,
