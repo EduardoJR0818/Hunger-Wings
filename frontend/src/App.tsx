@@ -178,7 +178,7 @@ function Reporte({ resumen, hallazgos }: { resumen: string; hallazgos: string[] 
       <CardHeader>
         <div className="flex items-center gap-3">
           <img src="/icon_file_text.svg" alt="Icono grafo" className="h-6 w-6" />
-          <CardTitle className="text-xl">Grafo de conocimiento</CardTitle>
+          <CardTitle className="text-xl">Reporte</CardTitle>
         </div>
       </CardHeader>
       <CardContent>
