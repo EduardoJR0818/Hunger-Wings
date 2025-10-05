@@ -135,7 +135,7 @@ function Navbar({ onSearch }: { onSearch: (term: string) => void }) {
 
   return (
     <div className="sticky top-0 z-30 w-full border-b bg-white/80 backdrop-blur">
-      <div className="mx-auto flex max-w-6xl items-center gap-2 p-3">
+      <div className="mx-auto flex items-center gap-2 p-3">
         <div className="text-xl font-semibold tracking-tight">GrafoConocimiento</div>
         <form
           className="ml-auto flex w-full max-w-xl items-center gap-2"
@@ -439,7 +439,7 @@ export default function App() {
     <div className="min-h-screen bg-slate-50">
       <Navbar onSearch={handleSearch} />
 
-      <main className="mx-auto grid max-w-6xl grid-cols-1 gap-6 p-4 md:grid-cols-5">
+      <main className="mx-auto grid grid-cols-1 gap-6 p-4 md:grid-cols-5">
         {/* Columna izquierda: Reporte */}
         <motion.section
           key={`reporte-${query}`}
@@ -489,7 +489,7 @@ export default function App() {
       <ModalArticulos open={open} onOpenChange={setOpen} nodo={selected} />
 
       {/* Carga manual de JSON (opcional) */}
-      <footer className="mx-auto max-w-6xl p-4 text-xs text-slate-500">
+      <footer className="mx-auto p-4 text-xs text-slate-500">
         <details>
           <summary className="cursor-pointer select-none">Cargar JSON manualmente (opcional)</summary>
           <div className="mt-3 flex flex-col gap-2 rounded-lg border bg-white p-3">
