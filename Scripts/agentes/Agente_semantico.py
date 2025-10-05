@@ -1,225 +1,151 @@
-from langchain.vectorstores import VectorStore
-from langchain_core.prompts import PromptTemplate
-from langchain_core.output_parsers import JsonOutputParser
-from langchain_core.documents import Document
-from langchain_core.runnables import RunnablePassthrough
-from typing import Any, Dict, List
+import json
+from typing import List, Dict, Any
 
-_JSON_SCHEMA: Dict[str, Any] = {
+from langchain_core.documents import Document
+from langchain_core.output_parsers import JsonOutputParser
+from langchain_core.vectorstores import VectorStore
+# Se asume que _PROMP y _JSON_SCHEMA están definidos en este archivo o se importan.
+# Para este ejemplo, los definiremos como placeholders.
+
+# ----------------------------------------------------
+# PLACEHOLDERS: Sustituye esto con tus definiciones reales
+# ----------------------------------------------------
+_JSON_SCHEMA = {
     "type": "object",
     "properties": {
         "reporte": {
             "type": "object",
-            "description": "El resumen ejecutivo y hallazgos clave de la respuesta.",
             "properties": {
-                "resumen": {"type": "string", "description": "Un resumen conciso y natural de la respuesta generada."},
-                "hallazgos": {
-                    "type": "array",
-                    "description": "Una lista de 3 a 5 puntos clave (hallazgos) extraídos del contexto.",
-                    "items": {"type": "string"}
-                }
-            },
-            "required": ["resumen", "hallazgos"]
+                "resumen": {"type": "string", "description": "Resumen conciso del hallazgo."},
+                "hallazgos": {"type": "array", "items": {"type": "string"}, "description": "Lista de puntos clave."},
+            }
         },
         "grafo": {
             "type": "array",
-            "description": "Lista de 3 a 5 conceptos clave para construir el grafo de conocimiento.",
             "items": {
                 "type": "object",
                 "properties": {
-                    "palabra": {"type": "string", "description": "La palabra o concepto más frecuente en los documentos."},
+                    "palabra": {"type": "string"},
                     "articulos": {
                         "type": "array",
-                        "description": "Información de los documentos de LangChain relacionados con esta palabra clave.",
                         "items": {
                             "type": "object",
                             "properties": {
-                                "titulo": {"type": "string", "description": "El título o nombre del documento (metadata 'name')."},
-                                "link": {"type": "string", "description": "La URL o ruta de origen del documento (metadata 'source')."}
-                            },
-                            "required": ["titulo", "link"]
+                                "titulo": {"type": "string"},
+                                "link": {"type": "string", "description": "URL de la fuente original."},
+                            }
                         }
                     },
-                    "relaciones": {
-                        "type": "array",
-                        "description": "Una lista de 3 palabras clave relacionadas que podrían formar un nodo en el grafo.",
-                        "items": {
-                            "type": "string",  # <--- ESTE ES EL CAMPO CORREGIDO
-                            "description": "Una palabra clave o concepto relacionado."
-                        }
-                    }
-                },
-                "required": ["palabra", "articulos", "relaciones"]
+                    "relaciones": {"type": "array", "items": {"type": "string"}},
+                }
             }
         }
-    },
-    "required": ["reporte", "grafo"]
+    }
 }
 
+_PROMPT = """
+Eres un Agente Semántico de Biología Espacial. Tu tarea es responder a la pregunta del usuario utilizando solo el contexto proporcionado.
+Genera una respuesta en formato JSON que cumpla exactamente con el esquema proporcionado.
 
-# =======================================================
-# DEFINICIÓN DEL PROMPT
-# =======================================================
-_PROMP = PromptTemplate.from_template("""
-    Eres un experto en biología espacial. Tu tarea es responder la pregunta del usuario.
-    
-    INSTRUCCIONES CLAVE:
-    1. Utiliza **exclusivamente** la información de los fragmentos proporcionados en el [CONTEXTO RECUPERADO].
-    2. Genera la respuesta **SOLO** en formato JSON que se ajuste estrictamente al esquema JSON proporcionado.
-    3. Para la sección 'grafo', extrae los conceptos clave de los documentos recuperados y utiliza su 'metadata' para llenar los campos 'titulo' y 'link'.
-    
-    Pregunta: {question}
-    
-    [CONTEXTO RECUPERADO]:
-    {context}
+Instrucciones Clave:
+1. Analiza el 'contexto_filtrado' para responder la 'pregunta_usuario'.
+2. El campo 'reporte' debe contener el resumen de la respuesta.
+3. El campo 'grafo' debe contener los conceptos clave extraídos del contexto, sus artículos de origen, y las relaciones entre ellos.
+4. **IMPORTANTE:** Para cada artículo en el campo 'grafo', utiliza el 'titulo' y 'link' exactos proporcionados en la metadato de los documentos fuente.
+5. El output DEBE ser un JSON válido.
 
-    [ESQUEMA JSON REQUERIDO]:
-    {json_schema}
-""")
+Contexto Filtrado (Documentos Fuente y Metadatos):
+---
+{contexto_filtrado}
+---
+
+Pregunta del Usuario: {question}
+"""
+# ----------------------------------------------------
+# FIN DE PLACEHOLDERS
+# ----------------------------------------------------
 
 
-# =======================================================
-# CLASE DEL AGENTE SEMÁNTICO
-# =======================================================
 class BiologySemanticAgent:
-    def __init__(self, vector_store: VectorStore, llm):
+    """
+    Agente que realiza RAG sobre una base de datos vectorial
+    y estructura la respuesta en un formato JSON para visualización de grafo.
+    """
+    # 1. ACTUALIZACIÓN DEL CONSTRUCTOR PARA ACEPTAR article_link_map
+    def __init__(self, vector_store: VectorStore, llm, article_link_map: Dict[str, str]):
         self.vector_store = vector_store
         self.llm = llm
+        self.article_link_map = article_link_map  # Almacenamos el mapa de links
         
         # Inicializa el parser de JSON
         self.json_parser = JsonOutputParser()
-        self.prompt_chain = _PROMP
+        self.prompt_template = _PROMPT
         
         # Cadena de Generación: Prompt -> LLM (forzado JSON) -> Parser (a dict de Python)
-        self.generation_chain = (
-            self.prompt_chain 
-            | self.llm.bind(response_schema=_JSON_SCHEMA)
-            | self.json_parser
-        )
+        # La cadena se construye en generate para incluir el contexto dinámicamente.
 
-    # Método para formatear los documentos (soluciona el AttributeError)
-    def _format_context(self, documents: List[Document]) -> str:
-        """Convierte una lista de objetos Document en una cadena legible para el LLM, incluyendo metadatos."""
-        formatted_context = []
-        for i, doc in enumerate(documents):
-            source = doc.metadata.get('source', 'Fuente Desconocida')
-            name = doc.metadata.get('name', 'Documento sin nombre')
 
-            formatted_context.append(
-                f"### Fragmento #{i+1}\n"
-                f"**Nombre:** {name}\n"
-                f"**Fuente/Link:** {source}\n"
-                f"**Contenido:**\n"
-                f"{doc.page_content}\n"
-            )
-        return "\n---\n".join(formatted_context)
-    
-    
-    def generate(self, question: str, k: int) -> Dict[str, Any] | None:
+    def _prepare_context(self, documents: List[Document]) -> str:
         """
-        Genera la respuesta y el grafo en formato JSON.
-        Devuelve un diccionario de Python o None si el parseo falla.
-        """
-        similarity_results = self.vector_store.similarity_search(question, k)
-        context_string = self._format_context(similarity_results) 
+        Prepara los documentos para el prompt, enriqueciendo los metadatos con el 'link' del CSV.
         
-        # Los datos de entrada que necesita el prompt
-        input_data = {
-            'question': question,
-            'context': context_string,
-            # Las instrucciones de formato del parser, esenciales para guiar al LLM
-            'json_schema': self.json_parser.get_format_instructions() 
-        }
+        Se asume que la metadato 'source' de LangChain contiene el TÍTULO exacto del artículo
+        usado como clave en ARTICLE_LINK_MAP.
+        """
+        prepared_data = []
+        
+        for doc in documents:
+            title = doc.metadata.get('source', 'Título Desconocido')
+            # 2. USAMOS EL MAPA PARA BUSCAR EL LINK
+            link = self.article_link_map.get(title, 'Link No Encontrado') 
+            
+            # Crea un diccionario simple con los datos relevantes para el LLM
+            # Incluimos el link para que el LLM lo use al llenar el campo 'articulos' del JSON.
+            prepared_data.append({
+                "source_title": title,
+                "source_link": link,
+                "snippet": doc.page_content[:200] + "...", # Recortar para no saturar el prompt
+                "full_page_content": doc.page_content
+            })
 
-        # Ejecutamos la cadena completa
+        # Serializa la lista de diccionarios para inyectarla en el prompt
+        return json.dumps(prepared_data, indent=2, ensure_ascii=False)
+
+
+    def generate(self, question: str, k_chunks: int) -> Dict[str, Any] | None:
+        """
+        Realiza la recuperación y la generación de la respuesta estructurada.
+        """
+        # 1. Recuperación
+        retrieved_docs = self.vector_store.similarity_search(question, k_chunks)
+        
+        if not retrieved_docs:
+            print("No se recuperaron documentos para generar la respuesta.")
+            return None
+
+        # 2. Preparación del Contexto (con links inyectados)
+        contexto_json = self._prepare_context(retrieved_docs)
+
+        # 3. Creación del Prompt Final
+        prompt_with_context = self.prompt_template.format(
+            contexto_filtrado=contexto_json,
+            question=question
+        )
+        
+        # 4. Configuración y Ejecución de la Cadena
         try:
-            # La cadena devuelve el diccionario de Python ya parseado
-            return self.generation_chain.invoke(input_data)
-        except Exception as e:
-            # Captura errores si el LLM devuelve un JSON malformado
-            print(f"ERROR FATAL DE PARSEO JSON. El LLM no cumplió el esquema: {e}")
-            return None # Devuelve None para evitar un fallo en la función de impresión
-
-'''
-class BiologySemanticAgent:
-    def __init__(self, vector_store: VectorStore, llm):
-        self.vector_store = vector_store
-        self.llm = llm
-        self.json_parser = JsonOutputParser(pydantic_object=None) # Usamos el parser genérico
-        
-        # 1. Creamos la cadena (Chain) para la generación JSON
-        # Este es el nuevo enfoque clave de LangChain:
-        self.chain = (
-            self.llm
-            .bind(response_schema=_JSON_SCHEMA) # Forzamos el esquema JSON
-            | self.json_parser
-        )
-
-    def _format_context(self, documents: list) -> str:
-        # Usamos la función de formato que creamos antes
-        formatted_context = []
-        for i, doc in enumerate(documents):
-            source = doc.metadata.get('source', 'Fuente Desconocida')
-            name = doc.metadata.get('name', 'Documento sin nombre')
-
-            formatted_context.append(
-                f"### Fragmento #{i+1}\n"
-                f"**Nombre:** {name}\n"
-                f"**Fuente/Link:** {source}\n"
-                f"**Contenido:**\n"
-                f"{doc.page_content}\n"
+            # Usamos el LLM directamente ya que la cadena se complica con el formato
+            # El LLM ya está inicializado para devolver JSON según el Canvas (response_mime_type)
+            response = self.llm.invoke(
+                [("user", prompt_with_context)],
+                config={"response_schema": _JSON_SCHEMA}
             )
-        return "\n---\n".join(formatted_context)
+            
+            # Intenta parsear la respuesta de texto (que debería ser JSON)
+            json_text = response.content.strip()
+            return json.loads(json_text)
 
-    # El método generate_stream ya no es útil para JSON estricto, usamos generate
-    def generate(self, question: str, k: int):
-        similarity_results = self.vector_store.similarity_search(question, k)
-        context_string = self._format_context(similarity_results) 
-        
-        prompt_with_context = _PROMP.invoke(
-            {
-                'question': question,
-                'context': context_string,
-                'json_schema': _JSON_SCHEMA # Pasamos el esquema JSON al prompt para que el LLM lo vea
-            }
-        )
-        
-        # 2. Invocamos la cadena (LLM + Parser)
-        # Esto devolverá un objeto JSON/Diccionario de Python
-        return self.llm.invoke(prompt_with_context, 
-                               config={"response_schema": _JSON_SCHEMA})
-
-    # Si aún quieres el método de streaming (aunque inestable para JSON):
-    def generate_stream(self, question: str, k: int):
-        # Para mantener el JSON estricto, es mejor no usar streaming aquí, 
-        # o tendrías que manejar el JSON incompleto en el frontend.
-        # Devuelve un solo bloque JSON con 'generate'.
-        return self.generate(question, k)
--------------------------------------------------------------------------------------
-class BiologySemanticAgent:
-    def __init__(self, vector_store: VectorStore, llm):
-        self.vector_store = vector_store
-        self.llm = llm
-
-    def generate(self, question: str, k: int):
-        similarity_results = self.vector_store.similarity_search(question, k)
-        prompt_with_context = _PROMP.invoke(
-            {
-                'question': question,
-                'context': similarity_results
-            }
-        )
-
-        return self.llm.invoke(prompt_with_context)
-    
-    def generate_stream(self, question: str, k: int):
-        similarity_results = self.vector_store.similarity_search(question, k)
-        prompt_with_context = _PROMP.invoke(
-            {
-                'question': question,
-                'context': similarity_results
-            }
-        )
-
-        return self.llm.stream(prompt_with_context)
-        '''
+        except Exception as e:
+            print(f"Error durante la generación o parseo del JSON: {e}")
+            # print(f"Respuesta del LLM (si disponible): {response.content}")
+            return None
