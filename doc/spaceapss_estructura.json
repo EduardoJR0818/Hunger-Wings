@@ -1,0 +1,18 @@
+{
+  "reporte": {
+    "resumen": "string",
+    "hallazgos": ["string", "string", ...]
+  },
+  "grafo": [
+    {
+      "palabra": "string",
+      "articulos": [
+        {
+          "titulo": "string",
+          "link": "string (URL)"
+        }
+      ],
+      "relaciones": ["string", "string", ...]
+    }
+  ]
+}
