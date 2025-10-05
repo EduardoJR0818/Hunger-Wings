@@ -135,39 +135,39 @@ function Navbar({ onSearch }: { onSearch: (term: string) => void }) {
 
   return (
     <div className="sticky top-0 z-30 w-full border-b bg-white/80 backdrop-blur">
-    <div className="mx-auto flex items-center justify-between gap-4 p-3 max-w-7xl">
-      {/* Logo y nombre */}
-      <div className="flex flex-shrink-0 items-center gap-3 min-w-[180px]">
-        <img src="/logo_bionova.svg" alt="Logo" className="h-12 w-12" />
-        <div className="text-3xl font-semibold tracking-tight whitespace-nowrap">
-          Bionova
+      <div className="mx-auto flex items-center justify-between gap-4 p-3">
+        {/* Logo y nombre */}
+        <div className="flex flex-shrink-0 items-center gap-3 min-w-[180px]">
+          <img src="/logo_bionova.svg" alt="Logo" className="h-12 w-12" />
+          <div className="text-3xl font-semibold tracking-tight whitespace-nowrap">
+            Bionova
+          </div>
         </div>
-      </div>
 
-      {/* Barra de búsqueda */}
-      <form
-        className="flex flex-1 max-w-xl items-center gap-2"
-        onSubmit={(e) => {
-          e.preventDefault();
-          onSearch(term);
-        }}
-      >
-        <div className="relative flex-1">
-          <Search
-            className="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2"
-            size={18}
-          />
-          <Input
-            className="pl-8"
-            placeholder="Buscar tema (ej. Microgravedad, Microbioma, Órbita terrestre...)"
-            value={term}
-            onChange={(e) => setTerm(e.target.value)}
-          />
-        </div>
-        <Button type="submit">Buscar</Button>
-      </form>
+        {/* Barra de búsqueda */}
+        <form
+          className="flex flex-1 max-w-xl items-center gap-2"
+          onSubmit={(e) => {
+            e.preventDefault();
+            onSearch(term);
+          }}
+        >
+          <div className="relative flex-1">
+            <Search
+              className="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2"
+              size={18}
+            />
+            <Input
+              className="pl-8"
+              placeholder="Buscar tema (ej. Microgravedad, Microbioma, Órbita terrestre...)"
+              value={term}
+              onChange={(e) => setTerm(e.target.value)}
+            />
+          </div>
+          <Button type="submit">Buscar</Button>
+        </form>
+      </div>
     </div>
-  </div>
 
   );
 }
