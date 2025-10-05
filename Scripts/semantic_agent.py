@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 # Nota: Asumo que el nombre correcto es 'PokemonSemanticAgent' basado en el 'collection_name'
 from Scripts.agentes.Agente_semantico import BiologySemanticAgent
 
-load_dotenv('.env')
+load_dotenv('Hunger-Wings\.env')
 
 # 1. Definición del LLM de Gemini
 gemini_llm = ChatGoogleGenerativeAI(

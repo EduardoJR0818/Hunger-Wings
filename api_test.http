@@ -1,0 +1,14 @@
+# PRUEBA DE ENDPOINT RAG: /api/query_json
+
+POST http://127.0.0.1:8000/api/query_json
+Content-Type: application/json
+
+{
+    "question": "Explica los procedimientos experimentales con animales para la misión STS-131 y de qué documentos se obtiene la información",
+    "k_chunks": 5
+}
+
+### Aquí puedes agregar más peticiones separadas por "###"
+
+# EJEMPLO: Petición a la ruta raíz (opcional)
+# GET http://127.0.0.1:8000/
