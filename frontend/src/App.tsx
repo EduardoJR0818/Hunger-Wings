@@ -135,28 +135,40 @@ function Navbar({ onSearch }: { onSearch: (term: string) => void }) {
 
   return (
     <div className="sticky top-0 z-30 w-full border-b bg-white/80 backdrop-blur">
-      <div className="mx-auto flex items-center gap-2 p-3">
-        <div className="text-xl font-semibold tracking-tight">GrafoConocimiento</div>
-        <form
-          className="ml-auto flex w-full max-w-xl items-center gap-2"
-          onSubmit={(e) => {
-            e.preventDefault();
-            onSearch(term);
-          }}
-        >
-          <div className="relative flex-1">
-            <Search className="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2" size={18} />
-            <Input
-              className="pl-8"
-              placeholder="Buscar tema (ej. IA generativa, creatividad, ética...)"
-              value={term}
-              onChange={(e) => setTerm(e.target.value)}
-            />
-          </div>
-          <Button type="submit" className="text-black">Buscar</Button>
-        </form>
+    <div className="mx-auto flex items-center justify-between gap-4 p-3 max-w-7xl">
+      {/* Logo y nombre */}
+      <div className="flex flex-shrink-0 items-center gap-3 min-w-[180px]">
+        <img src="/logo_bionova.svg" alt="Logo" className="h-12 w-12" />
+        <div className="text-3xl font-semibold tracking-tight whitespace-nowrap">
+          Bionova
+        </div>
       </div>
+
+      {/* Barra de búsqueda */}
+      <form
+        className="flex flex-1 max-w-xl items-center gap-2"
+        onSubmit={(e) => {
+          e.preventDefault();
+          onSearch(term);
+        }}
+      >
+        <div className="relative flex-1">
+          <Search
+            className="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2"
+            size={18}
+          />
+          <Input
+            className="pl-8"
+            placeholder="Buscar tema (ej. Microgravedad, Microbioma, Órbita terrestre...)"
+            value={term}
+            onChange={(e) => setTerm(e.target.value)}
+          />
+        </div>
+        <Button type="submit">Buscar</Button>
+      </form>
     </div>
+  </div>
+
   );
 }
 
@@ -164,7 +176,10 @@ function Reporte({ resumen, hallazgos }: { resumen: string; hallazgos: string[] 
   return (
     <Card className="shadow-md">
       <CardHeader>
-        <CardTitle>Reporte</CardTitle>
+        <div className="flex items-center gap-3">
+          <img src="/icon_file_text.svg" alt="Icono grafo" className="h-6 w-6" />
+          <CardTitle className="text-xl">Grafo de conocimiento</CardTitle>
+        </div>
       </CardHeader>
       <CardContent>
         <p className="mb-4 leading-relaxed text-slate-700">{resumen}</p>
@@ -179,7 +194,6 @@ function Reporte({ resumen, hallazgos }: { resumen: string; hallazgos: string[] 
     </Card>
   );
 }
-
 
 function drawRoundRect(
   ctx: CanvasRenderingContext2D,
@@ -264,11 +278,14 @@ function Grafo({ data, onNodeClick }: { data: GraphData; onNodeClick: (n: GraphN
   return (
     <Card className="shadow-md">
       <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>Grafo de conocimiento</CardTitle>
+        <div className="flex items-center gap-3">
+          <img src="/icon_waypoints.svg" alt="Icono grafo" className="h-6 w-6" />
+          <CardTitle className="text-xl">Grafo de conocimiento</CardTitle>
+        </div>
         <div className="flex items-center gap-2">
           <Button size="sm" variant="outline" onClick={zoomOut} title="Zoom out">−</Button>
           <Button size="sm" variant="outline" onClick={zoomIn} title="Zoom in">＋</Button>
-          <Button size="sm" onClick={zoomFit} title="Ajustar a la vista" className="text-black">Ajustar</Button>
+          <Button size="sm" onClick={zoomFit} title="Ajustar a la vista">Ajustar</Button>
         </div>
       </CardHeader>
       <CardContent className="h-[560px]" ref={containerRef}>
@@ -487,47 +504,6 @@ export default function App() {
 
       {/* Modal con artículos del nodo */}
       <ModalArticulos open={open} onOpenChange={setOpen} nodo={selected} />
-
-      {/* Carga manual de JSON (opcional) */}
-      <footer className="mx-auto p-4 text-xs text-slate-500">
-        <details>
-          <summary className="cursor-pointer select-none">Cargar JSON manualmente (opcional)</summary>
-          <div className="mt-3 flex flex-col gap-2 rounded-lg border bg-white p-3">
-            <input
-              type="file"
-              accept="application/json"
-              onChange={async (e) => {
-                const file = e.target.files?.[0];
-                if (!file) return;
-                const text = await file.text();
-                try {
-                  const j = JSON.parse(text) as DataJSON;
-                  setRawData(j);
-                } catch {
-                  alert("No se pudo parsear el JSON subido.");
-                }
-              }}
-            />
-            <p>
-              El archivo debe seguir la estructura {"{"}reporte:
-              {"{"}resumen, hallazgos[]{"}"}, grafo: Nodo[]{"}"}. Cada Nodo contiene {"{"}palabra, articulos[], relaciones[]{"}"}.
-            </p>
-          </div>
-        </details>
-        <div className="mt-4">
-          <Button
-            variant="outline"
-            onClick={() => {
-              setQuery("");
-              setSelected(null);
-              setOpen(false);
-            }}
-            className="gap-1"
-          >
-            <X size={16} /> Limpiar búsqueda
-          </Button>
-        </div>
-      </footer>
     </div>
   );
 }
