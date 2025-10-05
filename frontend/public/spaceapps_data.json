@@ -1,0 +1,182 @@
+{
+  "reporte": {
+    "resumen": "Este reporte sintetiza tendencias ficticias observadas en una colección de publicaciones alojadas en el repositorio indicado. Se destacan patrones sobre IA generativa, evaluación del aprendizaje, y diseño de experiencias educativas apoyadas por datos.",
+    "hallazgos": [
+      "La IA generativa se vincula con creatividad y evaluación auténtica en contextos educativos.",
+      "El pensamiento de diseño aparece como puente entre investigación aplicada y práctica docente.",
+      "Los artículos sobre analítica de aprendizaje se conectan con currículo y toma de decisiones.",
+      "La adopción de machine learning requiere consideraciones éticas y de equidad.",
+      "Los mapas conceptuales facilitan transferir hallazgos entre dominios STEM y humanidades."
+    ]
+  },
+  "grafo": [
+    {
+      "palabra": "IA generativa",
+      "articulos": [
+        {
+          "titulo": "IA generativa para fomentar la creatividad en el aula: un estudio exploratorio",
+          "link": "https://github.com/jgalazka/SB_publications/tree/main/education/2024_ia_generativa_creatividad_aula.pdf"
+        },
+        {
+          "titulo": "Guía práctica de prompts para proyectos estudiantiles",
+          "link": "https://github.com/jgalazka/SB_publications/tree/main/toolkits/2025_guia_prompts_proyectos_estudiantiles.pdf"
+        }
+      ],
+      "relaciones": ["creatividad", "evaluación", "pensamiento de diseño", "ética"]
+    },
+    {
+      "palabra": "creatividad",
+      "articulos": [
+        {
+          "titulo": "Medición de creatividad asistida por IA: rúbricas y casos",
+          "link": "https://github.com/jgalazka/SB_publications/tree/main/assessment/2023_medicion_creatividad_rubricas.pdf"
+        },
+        {
+          "titulo": "Talleres de ideación con modelos de lenguaje",
+          "link": "https://github.com/jgalazka/SB_publications/tree/main/workshops/2024_talleres_ideacion_llms.pdf"
+        }
+      ],
+      "relaciones": ["IA generativa", "pensamiento de diseño", "currículo"]
+    },
+    {
+      "palabra": "pensamiento de diseño",
+      "articulos": [
+        {
+          "titulo": "Design Thinking en cursos de ingeniería con apoyo de datos",
+          "link": "https://github.com/jgalazka/SB_publications/tree/main/design/2022_dt_ingenieria_analitica_aprendizaje.pdf"
+        },
+        {
+          "titulo": "Plantillas de prototipado rápido para aulas híbridas",
+          "link": "https://github.com/jgalazka/SB_publications/tree/main/toolkits/2023_plantillas_prototipado_hibrido.pdf"
+        }
+      ],
+      "relaciones": ["creatividad", "currículo", "analítica de aprendizaje"]
+    },
+    {
+      "palabra": "evaluación",
+      "articulos": [
+        {
+          "titulo": "Evaluación auténtica con apoyo de IA en proyectos finales",
+          "link": "https://github.com/jgalazka/SB_publications/tree/main/assessment/2024_evaluacion_autentica_ia_proyectos.pdf"
+        },
+        {
+          "titulo": "Rúbricas adaptativas para presentaciones orales",
+          "link": "https://github.com/jgalazka/SB_publications/tree/main/assessment/2023_rubricas_adaptativas_presentaciones.pdf"
+        }
+      ],
+      "relaciones": ["IA generativa", "ética", "currículo"]
+    },
+    {
+      "palabra": "ética",
+      "articulos": [
+        {
+          "titulo": "Consideraciones éticas en el uso de ML en educación",
+          "link": "https://github.com/jgalazka/SB_publications/tree/main/policy/2022_etica_ml_educacion_lineamientos.pdf"
+        },
+        {
+          "titulo": "Transparencia y sesgos en modelos de lenguaje",
+          "link": "https://github.com/jgalazka/SB_publications/tree/main/policy/2024_transparencia_sesgos_llm.pdf"
+        }
+      ],
+      "relaciones": ["IA generativa", "evaluación", "analítica de aprendizaje"]
+    },
+    {
+      "palabra": "machine learning",
+      "articulos": [
+        {
+          "titulo": "Introducción práctica a ML para educadores",
+          "link": "https://github.com/jgalazka/SB_publications/tree/main/education/2021_introduccion_ml_educadores.pdf"
+        },
+        {
+          "titulo": "Casos de uso de ML en retroalimentación formativa",
+          "link": "https://github.com/jgalazka/SB_publications/tree/main/education/2023_ml_feedback_formativo_casos.pdf"
+        }
+      ],
+      "relaciones": ["analítica de aprendizaje", "ética", "IA generativa"]
+    },
+    {
+      "palabra": "analítica de aprendizaje",
+      "articulos": [
+        {
+          "titulo": "Paneles de control para monitoreo de progreso",
+          "link": "https://github.com/jgalazka/SB_publications/tree/main/analytics/2022_dashboards_monitoreo_progreso.pdf"
+        },
+        {
+          "titulo": "Detección temprana de riesgo académico",
+          "link": "https://github.com/jgalazka/SB_publications/tree/main/analytics/2023_deteccion_temprana_riesgo.pdf"
+        }
+      ],
+      "relaciones": ["machine learning", "pensamiento de diseño", "currículo"]
+    },
+    {
+      "palabra": "currículo",
+      "articulos": [
+        {
+          "titulo": "Integración curricular de IA generativa en primer año",
+          "link": "https://github.com/jgalazka/SB_publications/tree/main/curriculum/2024_integracion_ia_generativa_primero.pdf"
+        },
+        {
+          "titulo": "Resultados de aprendizaje para proyectos con datos abiertos",
+          "link": "https://github.com/jgalazka/SB_publications/tree/main/curriculum/2022_resultados_aprendizaje_datos_abiertos.pdf"
+        }
+      ],
+      "relaciones": ["pensamiento de diseño", "evaluación", "creatividad"]
+    },
+    {
+      "palabra": "STEM",
+      "articulos": [
+        {
+          "titulo": "Proyectos STEM con sensores y analítica básica",
+          "link": "https://github.com/jgalazka/SB_publications/tree/main/stem/2021_proyectos_sensores_analitica.pdf"
+        },
+        {
+          "titulo": "Colaboración interdisciplinaria en laboratorios remotos",
+          "link": "https://github.com/jgalazka/SB_publications/tree/main/stem/2023_labs_remotos_interdisciplinarios.pdf"
+        }
+      ],
+      "relaciones": ["currículo", "analítica de aprendizaje", "creatividad"]
+    },
+    {
+      "palabra": "docencia híbrida",
+      "articulos": [
+        {
+          "titulo": "Estrategias híbridas con apoyo de herramientas generativas",
+          "link": "https://github.com/jgalazka/SB_publications/tree/main/teaching/2024_estrategias_hibridas_herramientas_gpt.pdf"
+        },
+        {
+          "titulo": "Diseño de actividades asincrónicas con feedback automatizado",
+          "link": "https://github.com/jgalazka/SB_publications/tree/main/teaching/2022_actividades_asincronicas_feedback.pdf"
+        }
+      ],
+      "relaciones": ["IA generativa", "evaluación", "pensamiento de diseño"]
+    },
+    {
+      "palabra": "equidad",
+      "articulos": [
+        {
+          "titulo": "Acceso y equidad en entornos con IA educativa",
+          "link": "https://github.com/jgalazka/SB_publications/tree/main/policy/2023_acceso_equidad_ia_educativa.pdf"
+        },
+        {
+          "titulo": "Brecha digital y estrategias de mitigación",
+          "link": "https://github.com/jgalazka/SB_publications/tree/main/policy/2021_brecha_digital_estrategias.pdf"
+        }
+      ],
+      "relaciones": ["ética", "currículo", "analítica de aprendizaje"]
+    },
+    {
+      "palabra": "mapas conceptuales",
+      "articulos": [
+        {
+          "titulo": "Construcción de mapas conceptuales con soporte de LLM",
+          "link": "https://github.com/jgalazka/SB_publications/tree/main/tools/2024_mapas_conceptuales_llm.pdf"
+        },
+        {
+          "titulo": "Evaluación de coherencia semántica en mapas estudiantiles",
+          "link": "https://github.com/jgalazka/SB_publications/tree/main/assessment/2023_coherencia_semantica_mapas.pdf"
+        }
+      ],
+      "relaciones": ["IA generativa", "creatividad", "evaluación"]
+    }
+  ]
+}
